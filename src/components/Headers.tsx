@@ -3,7 +3,7 @@
 import { Search, XIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 
 import useAuth from '@/hooks/queries/useAuth';
@@ -16,6 +16,8 @@ import { Input } from './ui/input';
 
 const Headers = () => {
   const isMobile = useWindowWidth();
+  const router = useRouter();
+
   const { meQuery } = useMe();
   const { logout } = useAuth();
 
@@ -25,6 +27,11 @@ const Headers = () => {
   useEffect(() => {
     setIsSearchOpen(false);
   }, [isMobile]);
+
+  const handleLogOut = () => {
+    logout();
+    router.push('/login');
+  };
 
   return (
     <div className='fixed z-10 h-[64px] w-full border-b border-neutral-900 bg-black md:h-20'>
@@ -80,7 +87,7 @@ const Headers = () => {
             {isOpen && (
               <div className='absolute right-0 -bottom-15 w-[200px] rounded-[16px] border border-neutral-900 bg-neutral-950 px-4 py-2'>
                 <button
-                  onClick={logout}
+                  onClick={handleLogOut}
                   className='hover:text-accent-red w-full cursor-pointer text-start transition-all duration-300'
                 >
                   Logout

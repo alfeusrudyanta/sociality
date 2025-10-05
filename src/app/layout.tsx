@@ -60,7 +60,7 @@ export default function RootLayout({
             )}
           >
             {children}
-            <Toaster position='top-right' />
+            <Toaster position='top-right' duration={500} />
           </body>
         </QueryClientProvider>
       </Provider>

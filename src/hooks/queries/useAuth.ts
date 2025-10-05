@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import getCookie from '@/lib/getCookie';
 import apiAuth from '@/services/queries/auth';
 import { PostRegisterReq, PostLoginReq } from '@/types/auth';
 
@@ -36,10 +37,13 @@ const useAuth = () => {
     loginMutation.reset();
   };
 
+  const isLoggedIn = typeof window !== 'undefined' && !!getCookie('token');
+
   return {
     registerMutation,
     loginMutation,
     logout,
+    isLoggedIn,
   };
 };
 

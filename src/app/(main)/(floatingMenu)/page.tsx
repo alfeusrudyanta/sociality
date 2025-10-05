@@ -22,13 +22,10 @@ import { AppDispatch, RootState } from '@/features/store';
 import useFeed from '@/hooks/queries/useFeed';
 import useLikes from '@/hooks/queries/useLikes';
 import useSaves from '@/hooks/queries/useSaves';
-import getCookie from '@/lib/getCookie';
 import { cn } from '@/lib/utils';
 import { Post } from '@/types/feed';
 
 const Home = () => {
-  const router = useRouter();
-
   const { feedQuery, allPosts } = useFeed();
 
   const dispatch = useDispatch<AppDispatch>();
@@ -36,8 +33,6 @@ const Home = () => {
     (state: RootState) => state.feed.postInteractions
   );
   const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  const isLoggedIn = typeof window !== 'undefined' && !!getCookie('token');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -75,12 +70,6 @@ const Home = () => {
       dispatch(setPostInteractions(allPosts));
     }
   }, [allPosts, dispatch]);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('/login');
-    }
-  }, [isLoggedIn, router]);
 
   return (
     <div className='my-20 md:my-[120px]'>
