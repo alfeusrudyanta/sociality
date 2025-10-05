@@ -122,7 +122,7 @@ const EditProfile = () => {
             onSuccess: () => {
               const usernameRoute =
                 meQuery.data?.data.profile.username ?? username;
-              toast.success('Profile Success Update', {
+              toast.success('Profile Updated', {
                 style: {
                   background: '#079455',
                   color: 'white',
@@ -164,7 +164,7 @@ const EditProfile = () => {
           onSuccess: () => {
             const usernameRoute =
               meQuery.data?.data.profile.username ?? username;
-            toast.success('Profile Success Update', {
+            toast.success('Profile Updated', {
               style: {
                 background: '#079455',
                 color: 'white',
