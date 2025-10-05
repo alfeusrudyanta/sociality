@@ -161,7 +161,7 @@ const SearchBar = () => {
       ref={containerRef}
       className='relative flex h-10 w-full items-center gap-2 rounded-full border border-neutral-900 bg-neutral-950 px-4 md:h-12 md:max-w-[490px]'
     >
-      <Search className='size-4 cursor-pointer' onClick={handleSearch} />
+      <Search className='size-5 cursor-pointer' onClick={handleSearch} />
 
       <Input
         type='text'

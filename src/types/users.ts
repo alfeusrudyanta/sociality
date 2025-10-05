@@ -48,6 +48,19 @@ type GetUsersLikesParamsReq = {
   limit: number;
 };
 
+type ProfileUserData = {
+  id: number;
+  name: string;
+  username: string;
+  bio: string;
+  avatarUrl: string | null;
+  email: string;
+  phone: string;
+  counts: UserCounts;
+  isFollowing: boolean;
+  isMe: boolean;
+};
+
 /* Infinite Query */
 type GetUsersLikesRes = ApiResponse & {
   data: {
@@ -74,18 +87,7 @@ type GetUsersSearchRes = ApiResponse & {
 };
 
 type GetUsersRes = ApiResponse & {
-  data: {
-    id: number;
-    name: string;
-    username: string;
-    bio: string;
-    avatarUrl: string | null;
-    email: string;
-    phone: string;
-    counts: UserCounts;
-    isFollowing: boolean;
-    isMe: boolean;
-  };
+  data: ProfileUserData;
 };
 
 export type {
@@ -97,4 +99,5 @@ export type {
   GetUsersSearchRes,
   GetUsersRes,
   UserSearch,
+  ProfileUserData,
 };

@@ -8,11 +8,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import CommentOverlay from '@/components/CommentOverlay';
+import FollowOverlay from '@/components/FollowOverlay';
 import { Button } from '@/components/ui/button';
 
 import Error from '@/app/error';
 import Loading from '@/app/loading';
 import { setPostInteractions } from '@/features/feed/feedSlice';
+import { setProfile } from '@/features/profile/profileSlice';
 import { AppDispatch, RootState } from '@/features/store';
 import useFollow from '@/hooks/queries/useFollow';
 import useMe from '@/hooks/queries/useMe';
@@ -171,8 +173,12 @@ export default Profile;
 
 const User = () => {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const profile = useSelector((state: RootState) => state.profile);
+
   const { username } = useParams<{ username: string }>();
-  const { user } = useUsers(username);
+  const { meQuery } = useMe();
+  const { user, userQuery } = useUsers(username);
   const { followMutation, unfollowMutation } = useFollow();
   const [followedByMe, setFollowedByMe] = useState<boolean>(
     () => user?.isFollowing ?? false
@@ -180,6 +186,8 @@ const User = () => {
   const [profilePicture, setProfilePicture] = useState<string>(
     user?.avatarUrl ?? '/images/profile-picture.png'
   );
+  const [isFollowerOpen, setIsFollowerOpen] = useState<boolean>(false);
+  const [isFollowingOpen, setIsFollowingOpen] = useState<boolean>(false);
 
   const handleFollow = () => {
     if (followedByMe) {
@@ -196,6 +204,23 @@ const User = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (
+      meQuery.isSuccess &&
+      userQuery.isSuccess &&
+      meQuery.data?.data?.profile?.username === username
+    ) {
+      dispatch(setProfile(userQuery.data.data));
+    }
+  }, [
+    meQuery.isSuccess,
+    userQuery.isSuccess,
+    username,
+    dispatch,
+    meQuery.data?.data?.profile?.username,
+    userQuery.data?.data,
+  ]);
 
   return (
     <div className='flex flex-1 flex-col gap-4'>
@@ -267,20 +292,28 @@ const User = () => {
         </div>
 
         {/* Followers */}
-        <div className='flex flex-1 flex-col gap-[2px] text-center'>
+        <button
+          onClick={() => setIsFollowerOpen((prev) => !prev)}
+          className='flex flex-1 cursor-pointer flex-col gap-[2px] text-center'
+        >
           <span className='text-lg font-bold md:text-xl'>
             {user?.counts.followers}
           </span>
           <span className='text-xs text-neutral-400'>Followers</span>
-        </div>
+        </button>
 
         {/* Following */}
-        <div className='flex flex-1 flex-col gap-[2px] text-center'>
+        <button
+          onClick={() => setIsFollowingOpen((prev) => !prev)}
+          className='flex flex-1 cursor-pointer flex-col gap-[2px] text-center'
+        >
           <span className='text-lg font-bold md:text-xl'>
-            {user?.counts.following}
+            {meQuery.data?.data?.profile?.username === username
+              ? profile.counts.following
+              : user?.counts.following}
           </span>
           <span className='text-xs text-neutral-400'>Following</span>
-        </div>
+        </button>
 
         {/* Likes */}
         <div className='flex flex-1 flex-col gap-[2px] text-center'>
@@ -290,6 +323,24 @@ const User = () => {
           <span className='text-xs text-neutral-400'>Likes</span>
         </div>
       </div>
+
+      {isFollowerOpen && user?.username && (
+        <FollowOverlay
+          username={user?.username}
+          isOpen={isFollowerOpen}
+          setIsOpen={setIsFollowerOpen}
+          type='followers'
+        />
+      )}
+
+      {isFollowingOpen && user?.username && (
+        <FollowOverlay
+          username={user?.username}
+          isOpen={isFollowingOpen}
+          setIsOpen={setIsFollowingOpen}
+          type='following'
+        />
+      )}
     </div>
   );
 };
@@ -305,18 +356,18 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
     useUsers(username);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const userQueryData = type === 'gallery' ? usersPostsQuery : usersLikesQuery;
-  const userData = type === 'gallery' ? usersPosts : usersLikes;
+  const activeQuery = type === 'gallery' ? usersPostsQuery : usersLikesQuery;
+  const activePosts = type === 'gallery' ? usersPosts : usersLikes;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (
           entries[0].isIntersecting &&
-          userQueryData.hasNextPage &&
-          !userQueryData.isFetchingNextPage
+          activeQuery.hasNextPage &&
+          !activeQuery.isFetchingNextPage
         ) {
-          userQueryData.fetchNextPage();
+          activeQuery.fetchNextPage();
         }
       },
       { threshold: 0.1 }
@@ -333,17 +384,17 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
       }
     };
   }, [
-    userQueryData,
-    userQueryData.hasNextPage,
-    userQueryData.isFetchingNextPage,
-    userQueryData.fetchNextPage,
+    activeQuery,
+    activeQuery.hasNextPage,
+    activeQuery.isFetchingNextPage,
+    activeQuery.fetchNextPage,
   ]);
 
   return (
     <div>
-      {userData.length === 0 ? (
+      {activePosts.length === 0 ? (
         <>
-          {userData === usersPosts &&
+          {activePosts === usersPosts &&
             meQuery.data?.data.profile.username === username && (
               <div className='mx-auto flex max-w-[450px] flex-col items-center justify-center gap-6 pt-[50px] text-center'>
                 <div className='flex flex-col gap-1'>
@@ -361,7 +412,7 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
               </div>
             )}
 
-          {userData === usersPosts &&
+          {activePosts === usersPosts &&
             meQuery.data?.data.profile.username !== username && (
               <div className='mx-auto flex max-w-[450px] flex-col items-center justify-center gap-6 pt-[50px] text-center'>
                 <div className='flex flex-col gap-1'>
@@ -376,7 +427,7 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
               </div>
             )}
 
-          {userData === usersLikes && (
+          {activePosts === usersLikes && (
             <div className='mx-auto flex max-w-[450px] flex-col items-center justify-center gap-6 pt-[50px] text-center'>
               <div className='flex flex-col gap-1'>
                 <span className='text-md font-bold md:text-lg'>
@@ -392,7 +443,7 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
         </>
       ) : (
         <div className='grid grid-cols-3 gap-[2px] md:gap-1'>
-          {userData.map((picture) => (
+          {activePosts.map((picture) => (
             <PostItem key={'Post Id:' + picture.id} id={picture.id} />
           ))}
         </div>
