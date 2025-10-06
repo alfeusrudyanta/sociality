@@ -19,8 +19,11 @@ import {
   updatePostLikes,
   updatePostUnLikes,
 } from '@/features/feed/feedSlice';
+import { handleDeletePostCount } from '@/features/profile/profileSlice';
 import useComments from '@/hooks/queries/useComments';
 import useLikes from '@/hooks/queries/useLikes';
+import useMe from '@/hooks/queries/useMe';
+import usePosts from '@/hooks/queries/usePosts';
 import useSaves from '@/hooks/queries/useSaves';
 import { cn } from '@/lib/utils';
 import { Comments } from '@/types/comments';
@@ -44,6 +47,7 @@ type CommentOverlayProps = {
   likedFeed: boolean;
   likeCount: number;
   commentCount: number;
+  onDelete: () => void;
 };
 
 const CommentOverlay: React.FC<CommentOverlayProps> = ({
@@ -59,9 +63,12 @@ const CommentOverlay: React.FC<CommentOverlayProps> = ({
   likedFeed,
   likeCount,
   commentCount,
+  onDelete,
 }) => {
   const dispatch = useDispatch();
 
+  const { meQuery } = useMe();
+  const { deletePostMutation } = usePosts();
   const { postCommentMutation, comments, commentsQuery } = useComments(id);
   const { likeMutation, unlikeMutation } = useLikes(id);
   const { saveMutation, unsaveMutation } = useSaves(id);
@@ -71,6 +78,7 @@ const CommentOverlay: React.FC<CommentOverlayProps> = ({
   const [textInput, setTextInput] = useState<string>('');
   const [saved, setSaved] = useState<boolean>(false);
   const [isLikeOpen, setIslikeOpen] = useState<boolean>(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
 
   dayjs.extend(relativeTime);
 
@@ -177,6 +185,15 @@ const CommentOverlay: React.FC<CommentOverlayProps> = ({
     }
   };
 
+  const handleDeletePost = () => {
+    deletePostMutation.mutate(id, {
+      onSuccess: () => {
+        onDelete();
+        dispatch(handleDeletePostCount());
+      },
+    });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className='flex max-h-[60%] bg-neutral-950 pt-12 md:max-h-[760px] md:max-w-[1200px] md:gap-5'>
@@ -226,7 +243,26 @@ const CommentOverlay: React.FC<CommentOverlayProps> = ({
                   </span>
                 </div>
               </div>
-              <Ellipsis className='cursor-pointer' />
+
+              {meQuery.data?.data.profile.username === authorUsername && (
+                <div className='relative'>
+                  <Ellipsis
+                    onClick={() => setIsDeleteOpen((prev) => !prev)}
+                    className='cursor-pointer'
+                  />
+
+                  {isDeleteOpen && (
+                    <div className='absolute right-0 -bottom-15 w-[200px] rounded-[16px] border border-neutral-900 bg-neutral-950 px-4 py-2'>
+                      <button
+                        onClick={handleDeletePost}
+                        className='hover:text-accent-red w-full cursor-pointer text-start transition-all duration-300'
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Scrollable Caption */}

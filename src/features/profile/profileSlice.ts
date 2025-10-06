@@ -33,9 +33,16 @@ const profileSlice = createSlice({
     handleDeleteFollowing(state) {
       state.counts.following -= 1;
     },
+    handleDeletePostCount(state) {
+      state.counts.post -= 1;
+    },
   },
 });
 
-export const { setProfile, handleAddFollowing, handleDeleteFollowing } =
-  profileSlice.actions;
+export const {
+  setProfile,
+  handleAddFollowing,
+  handleDeleteFollowing,
+  handleDeletePostCount,
+} = profileSlice.actions;
 export default profileSlice.reducer;

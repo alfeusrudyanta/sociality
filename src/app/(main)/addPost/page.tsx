@@ -231,7 +231,7 @@ const AddPost = () => {
           onClick={handleAddPost}
           type='button'
         >
-          Share
+          {createPostMutation.isPending ? 'Sharing...' : 'Share'}
         </Button>
       </div>
     </div>

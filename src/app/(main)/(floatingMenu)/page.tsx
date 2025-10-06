@@ -5,7 +5,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { Bookmark, Heart, Send, MessageSquareMore } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
@@ -133,6 +132,7 @@ const FeedCard: React.FC<Post> = (feed) => {
   const [showMore, setShowMore] = useState<boolean>(false);
   const [isLikeOpen, setIslikeOpen] = useState<boolean>(false);
   const [isCommentOpen, setIsCommentOpen] = useState<boolean>(false);
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const [isClamped, setIsClamped] = useState<boolean>(false);
   const spanRef = useRef<HTMLSpanElement>(null);
 
@@ -197,6 +197,14 @@ const FeedCard: React.FC<Post> = (feed) => {
       setIsClamped(span.scrollHeight > span.clientHeight);
     }
   }, [feed.caption]);
+
+  const handleDelete = () => {
+    setIsDeleted(true);
+  };
+
+  if (isDeleted) {
+    return null;
+  }
 
   dayjs.extend(relativeTime);
 
@@ -297,6 +305,7 @@ const FeedCard: React.FC<Post> = (feed) => {
 
       <LikeOverlay id={feed.id} isOpen={isLikeOpen} setIsOpen={setIslikeOpen} />
       <CommentOverlay
+        key={'Feed Id: ' + feed.id}
         id={feed.id}
         isOpen={isCommentOpen}
         setIsOpen={setIsCommentOpen}
@@ -310,6 +319,7 @@ const FeedCard: React.FC<Post> = (feed) => {
         likedFeed={feed.likedByMe}
         likeCount={feed.likeCount}
         commentCount={feed.commentCount}
+        onDelete={handleDelete}
       />
     </div>
   );

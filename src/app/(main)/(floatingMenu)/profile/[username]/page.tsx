@@ -28,6 +28,7 @@ const Profile = () => {
   const [option, setOption] = useState<'gallery' | 'saved' | 'liked'>(
     'gallery'
   );
+  const [deletedPostIds, setDeletedPostIds] = useState<number[]>([]);
 
   const { meQuery } = useMe();
   const { username } = useParams<{ username: string }>();
@@ -160,9 +161,25 @@ const Profile = () => {
           </div>
 
           {/* Image List */}
-          {option === 'gallery' && <GalleryFeeds />}
-          {option === 'saved' && <SavedFeeds />}
-          {option === 'liked' && <GalleryFeeds type='liked' />}
+          {option === 'gallery' && (
+            <GalleryFeeds
+              deletedPostIds={deletedPostIds}
+              setDeletedPostIds={setDeletedPostIds}
+            />
+          )}
+          {option === 'saved' && (
+            <SavedFeeds
+              deletedPostIds={deletedPostIds}
+              setDeletedPostIds={setDeletedPostIds}
+            />
+          )}
+          {option === 'liked' && (
+            <GalleryFeeds
+              type='liked'
+              deletedPostIds={deletedPostIds}
+              setDeletedPostIds={setDeletedPostIds}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -286,7 +303,9 @@ const User = () => {
         {/* Post */}
         <div className='flex flex-1 flex-col gap-[2px] text-center'>
           <span className='text-lg font-bold md:text-xl'>
-            {user?.counts.post}
+            {meQuery.data?.data?.profile?.username === username
+              ? profile.counts.post
+              : user?.counts.post}
           </span>
           <span className='text-xs text-neutral-400'>Post</span>
         </div>
@@ -347,9 +366,15 @@ const User = () => {
 
 type GalleryFeedsProps = {
   type?: 'gallery' | 'liked';
+  deletedPostIds: number[];
+  setDeletedPostIds: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
-const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
+const GalleryFeeds: React.FC<GalleryFeedsProps> = ({
+  type = 'gallery',
+  deletedPostIds,
+  setDeletedPostIds,
+}) => {
   const { meQuery } = useMe();
   const { username } = useParams<{ username: string }>();
   const { usersPostsQuery, usersPosts, usersLikesQuery, usersLikes } =
@@ -358,6 +383,11 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
 
   const activeQuery = type === 'gallery' ? usersPostsQuery : usersLikesQuery;
   const activePosts = type === 'gallery' ? usersPosts : usersLikes;
+
+  // Filter out deleted posts
+  const filteredPosts = activePosts.filter(
+    (post) => !deletedPostIds.includes(post.id)
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -390,9 +420,13 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
     activeQuery.fetchNextPage,
   ]);
 
+  const handlePostDeleted = (deletedId: number) => {
+    setDeletedPostIds((prev) => [...prev, deletedId]);
+  };
+
   return (
     <div>
-      {activePosts.length === 0 ? (
+      {filteredPosts.length === 0 ? (
         <>
           {activePosts === usersPosts &&
             meQuery.data?.data.profile.username === username && (
@@ -443,8 +477,12 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
         </>
       ) : (
         <div className='grid grid-cols-3 gap-[2px] md:gap-1'>
-          {activePosts.map((picture) => (
-            <PostItem key={'Post Id:' + picture.id} id={picture.id} />
+          {filteredPosts.map((post) => (
+            <PostItem
+              key={'Post Id:' + post.id}
+              id={post.id}
+              onPostDeleted={handlePostDeleted}
+            />
           ))}
         </div>
       )}
@@ -455,9 +493,20 @@ const GalleryFeeds: React.FC<GalleryFeedsProps> = ({ type = 'gallery' }) => {
   );
 };
 
-const SavedFeeds = () => {
+const SavedFeeds = ({
+  deletedPostIds,
+  setDeletedPostIds,
+}: {
+  deletedPostIds: number[];
+  setDeletedPostIds: React.Dispatch<React.SetStateAction<number[]>>;
+}) => {
   const { meSavedQuery, savedPosts } = useSaves();
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Filter out deleted posts
+  const filteredPosts = savedPosts.filter(
+    (post) => !deletedPostIds.includes(post.id)
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -486,9 +535,13 @@ const SavedFeeds = () => {
     meSavedQuery.fetchNextPage,
   ]);
 
+  const handlePostDeleted = (deletedId: number) => {
+    setDeletedPostIds((prev) => [...prev, deletedId]);
+  };
+
   return (
     <div>
-      {savedPosts.length === 0 ? (
+      {filteredPosts.length === 0 ? (
         <div className='mx-auto flex max-w-[450px] flex-col items-center justify-center gap-6 pt-[50px] text-center'>
           <div className='flex flex-col gap-1'>
             <span className='text-md font-bold md:text-lg'>
@@ -505,9 +558,13 @@ const SavedFeeds = () => {
         </div>
       ) : (
         <div className='grid grid-cols-3 gap-[2px] md:gap-1'>
-          {savedPosts.map((post) => (
+          {filteredPosts.map((post) => (
             <div key={post.id}>
-              <PostItem key={'Saved Post Id:' + post.id} id={post.id} />
+              <PostItem
+                key={'Saved Post Id:' + post.id}
+                id={post.id}
+                onPostDeleted={handlePostDeleted}
+              />
             </div>
           ))}
         </div>
@@ -518,7 +575,12 @@ const SavedFeeds = () => {
   );
 };
 
-const PostItem = ({ id }: { id: number }) => {
+type PostItemProps = {
+  id: number;
+  onPostDeleted: (id: number) => void | undefined;
+};
+
+const PostItem: React.FC<PostItemProps> = ({ id, onPostDeleted }) => {
   const dispatch = useDispatch<AppDispatch>();
   const postInteractions = useSelector(
     (state: RootState) => state.feed.postInteractions
@@ -533,18 +595,36 @@ const PostItem = ({ id }: { id: number }) => {
 
   const postData = postInteractions[id];
 
-  if (!postData) {
+  if (postQuery.isError) {
+    console.warn(`Post with ID ${id} not found, skipping render`);
+    onPostDeleted?.(id); // Notify parent that this post doesn't exist
+    return null;
+  }
+
+  if (!postData || postQuery.isLoading) {
     return <div className='text-center'>Loading...</div>;
   }
 
-  return <PictureList {...postData} />;
+  return (
+    <PictureList {...postData} onPostDeleted={() => onPostDeleted?.(id)} />
+  );
 };
 
-const PictureList: React.FC<Post> = (post) => {
+const PictureList: React.FC<Post & { onPostDeleted?: () => void }> = (post) => {
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [postImage, setPostImage] = useState<string>(
     post.imageUrl ?? '/images/post-img.png'
   );
+
+  const handleDelete = () => {
+    setIsDeleted(true);
+    post.onPostDeleted?.(); // Notify parent about deletion
+  };
+
+  if (isDeleted) {
+    return null;
+  }
 
   return (
     <div key={post.id}>
@@ -559,6 +639,7 @@ const PictureList: React.FC<Post> = (post) => {
       />
 
       <CommentOverlay
+        key={'Post Id: ' + post.id}
         id={post.id}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
@@ -572,6 +653,7 @@ const PictureList: React.FC<Post> = (post) => {
         likedFeed={post.likedByMe}
         likeCount={post.likeCount}
         commentCount={post.commentCount}
+        onDelete={handleDelete}
       />
     </div>
   );
