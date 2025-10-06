@@ -1,18 +1,18 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 const useWindowWidth = () => {
-  const getWidth = () =>
-    typeof window !== 'undefined' ? window.innerWidth : 0;
-
-  const [width, setWidth] = useState<number>(getWidth());
+  const [width, setWidth] = useState<number | null>(null);
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
+    setWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const isMobile = width < 768;
+  const isMobile = width !== null ? width < 768 : false;
   return isMobile;
 };
 
