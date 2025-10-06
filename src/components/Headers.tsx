@@ -21,8 +21,20 @@ const Headers = () => {
   const { meQuery } = useMe();
   const { logout } = useAuth();
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLogoutOpen, setIsLogoutOpen] = useState<boolean>(false);
   const [isSearhOpen, setIsSearchOpen] = useState<boolean>(false);
+
+  const logoutRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (logoutRef.current && !logoutRef.current.contains(e.target as Node)) {
+        setIsLogoutOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     setIsSearchOpen(false);
@@ -64,7 +76,8 @@ const Headers = () => {
 
           {/* Profile Picture */}
           <div
-            onClick={() => setIsOpen((prev) => !prev)}
+            ref={logoutRef}
+            onClick={() => setIsLogoutOpen((prev) => !prev)}
             className='relative flex cursor-pointer items-center gap-3'
           >
             <Image
@@ -84,7 +97,7 @@ const Headers = () => {
               </span>
             )}
 
-            {isOpen && (
+            {isLogoutOpen && (
               <div className='absolute right-0 -bottom-15 w-[200px] rounded-[16px] border border-neutral-900 bg-neutral-950 px-4 py-2'>
                 <button
                   onClick={handleLogOut}
