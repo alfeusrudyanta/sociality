@@ -104,7 +104,7 @@ const Headers = () => {
 
           <XIcon
             onClick={() => setIsSearchOpen(false)}
-            className='size-6 cursor-pointer'
+            className='size-5 cursor-pointer'
           />
         </div>
       )}
