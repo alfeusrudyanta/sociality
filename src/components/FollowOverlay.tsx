@@ -9,6 +9,7 @@ import {
   handleDeleteFollowing,
 } from '@/features/profile/profileSlice';
 import useFollow from '@/hooks/queries/useFollow';
+import useMe from '@/hooks/queries/useMe';
 
 import { Button } from './ui/button';
 import { DialogHeader, Dialog, DialogContent, DialogTitle } from './ui/dialog';
@@ -110,6 +111,8 @@ const FollowPostCard: React.FC<FollowPostCardProps> = ({
   isFollowedByMe,
 }) => {
   const dispatch = useDispatch();
+  const { meQuery } = useMe();
+
   const [followedByMe, setFollowedByMe] = useState<boolean>(
     () => isFollowedByMe
   );
@@ -159,22 +162,24 @@ const FollowPostCard: React.FC<FollowPostCardProps> = ({
       </Link>
 
       {/* Follow Button */}
-      <Button
-        type='button'
-        size='blank'
-        onClick={handleFollow}
-        variant={followedByMe ? 'transparant' : 'default'}
-        className='px-4'
-      >
-        {followedByMe ? (
-          <span className='flex items-center gap-2'>
-            <CircleCheck />
-            Following
-          </span>
-        ) : (
-          'Follow'
-        )}
-      </Button>
+      {meQuery.data?.data.profile.username !== username && (
+        <Button
+          type='button'
+          size='blank'
+          onClick={handleFollow}
+          variant={followedByMe ? 'transparant' : 'default'}
+          className='px-4'
+        >
+          {followedByMe ? (
+            <span className='flex items-center gap-2'>
+              <CircleCheck />
+              Following
+            </span>
+          ) : (
+            'Follow'
+          )}
+        </Button>
+      )}
     </div>
   );
 };
