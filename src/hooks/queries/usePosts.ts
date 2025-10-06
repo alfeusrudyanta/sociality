@@ -32,6 +32,7 @@ const usePosts = (postId?: number) => {
     mutationFn: (id: number) => apiPosts.deletePosts(id),
     onSuccess: (_, id) => {
       queryClient.removeQueries({ queryKey: ['feed'] });
+      queryClient.removeQueries({ queryKey: ['user'] });
       queryClient.removeQueries({ queryKey: ['posts', id] });
       queryClient.removeQueries({ queryKey: ['likes', id] });
       queryClient.removeQueries({ queryKey: ['comments', id] });

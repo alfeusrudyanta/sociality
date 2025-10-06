@@ -15,6 +15,7 @@ const useMe = () => {
     mutationFn: (data: PatchMeReq) => apiMe.patchMe(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.removeQueries({ queryKey: ['user'] });
     },
   });
 
