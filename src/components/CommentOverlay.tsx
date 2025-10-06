@@ -191,6 +191,18 @@ const CommentOverlay: React.FC<CommentOverlayProps> = ({
         onDelete();
         dispatch(handleDeletePostCount());
       },
+      onError: () => {
+        toast.error('Failed to delete post', {
+          style: {
+            background: '#d9206e',
+            color: 'white',
+            borderRadius: '10px',
+            height: '40px',
+            border: 'none',
+            margin: '70px 0px 0px 0px',
+          },
+        });
+      },
     });
   };
 

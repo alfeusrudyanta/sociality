@@ -17,6 +17,7 @@ const usePosts = (postId?: number) => {
       if (!postId) throw new Error('Post ID is required');
       return apiPosts.getPosts(postId);
     },
+    staleTime: 0,
     enabled: !!postId,
   });
 
@@ -30,7 +31,10 @@ const usePosts = (postId?: number) => {
   const deletePostMutation = useMutation<DeletePostsRes, Error, number>({
     mutationFn: (id: number) => apiPosts.deletePosts(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['posts', id] });
+      queryClient.removeQueries({ queryKey: ['feed'] });
+      queryClient.removeQueries({ queryKey: ['posts', id] });
+      queryClient.removeQueries({ queryKey: ['likes', id] });
+      queryClient.removeQueries({ queryKey: ['comments', id] });
     },
   });
 
