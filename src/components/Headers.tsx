@@ -164,68 +164,66 @@ const SearchBar = () => {
   };
 
   return (
-    <div className='flex-1 md:mx-4'>
-      <div
-        ref={containerRef}
-        className='relative flex h-10 w-full items-center gap-2 rounded-full border border-neutral-900 bg-neutral-950 px-4 md:h-12 md:max-w-[490px]'
-      >
-        <Search className='size-5 cursor-pointer' onClick={handleSearch} />
+    <div
+      ref={containerRef}
+      className='relative flex h-10 w-full items-center gap-2 rounded-full border border-neutral-900 bg-neutral-950 px-4 md:mx-4 md:h-12 md:max-w-[490px]'
+    >
+      <Search className='size-5 cursor-pointer' onClick={handleSearch} />
 
-        <Input
-          type='text'
-          placeholder='Search'
-          value={query}
-          className='border-none px-0 outline-0 focus-visible:border-0 focus-visible:ring-0'
-          onKeyDown={handleKeyDown}
-          onChange={(e) => setQuery(e.target.value)}
+      <Input
+        type='text'
+        placeholder='Search'
+        value={query}
+        className='border-none px-0 outline-0 focus-visible:border-0 focus-visible:ring-0'
+        onKeyDown={handleKeyDown}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      {query.length > 0 && (
+        <XIcon
+          onClick={() => {
+            setQuery('');
+          }}
+          className='size-4 cursor-pointer md:size-5'
         />
+      )}
 
-        {query.length > 0 && (
-          <XIcon
-            onClick={() => {
-              setQuery('');
-            }}
-            className='size-4 cursor-pointer md:size-5'
-          />
-        )}
-
-        {showSearch && (
-          <div className='absolute top-[47px] flex w-full -translate-x-4 flex-col gap-4 rounded-[20px] border border-neutral-900 bg-neutral-950 p-4 md:top-[58px] md:p-5'>
-            {usersSearch.length === 0 ? (
-              <div className='flex flex-col items-center justify-center text-center md:h-[155px]'>
-                <span className='font-bold'>No results found</span>
-                <span className='text-neutral-400 md:text-sm'>
-                  Change your keyword
-                </span>
-              </div>
-            ) : (
-              usersSearch.map((user) => (
-                <Link
-                  href={`/profile/${user.username}`}
-                  key={'Search: ' + user.id}
-                  className='group flex w-full cursor-pointer items-center gap-2'
-                >
-                  <Image
-                    src={user.avatarUrl ?? '/images/profile-picture.png'}
-                    alt={user.name ?? 'User Profile Picture'}
-                    height={48}
-                    width={48}
-                    className='size-12 rounded-full'
-                  />
-                  <div className='flex w-full flex-col'>
-                    <span className='group-hover:text-primary-300 font-bold transition-all duration-300 md:text-sm'>
-                      {user.name}
-                    </span>
-                    <span className='text-neutral-400 md:text-sm'>
-                      {user.username}
-                    </span>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-        )}
-      </div>
+      {showSearch && (
+        <div className='absolute top-[47px] flex w-full -translate-x-4 flex-col gap-4 rounded-[20px] border border-neutral-900 bg-neutral-950 p-4 md:top-[58px] md:p-5'>
+          {usersSearch.length === 0 ? (
+            <div className='flex flex-col items-center justify-center text-center md:h-[155px]'>
+              <span className='font-bold'>No results found</span>
+              <span className='text-neutral-400 md:text-sm'>
+                Change your keyword
+              </span>
+            </div>
+          ) : (
+            usersSearch.map((user) => (
+              <Link
+                href={`/profile/${user.username}`}
+                key={'Search: ' + user.id}
+                className='group flex w-full cursor-pointer items-center gap-2'
+              >
+                <Image
+                  src={user.avatarUrl ?? '/images/profile-picture.png'}
+                  alt={user.name ?? 'User Profile Picture'}
+                  height={48}
+                  width={48}
+                  className='size-12 rounded-full'
+                />
+                <div className='flex w-full flex-col'>
+                  <span className='group-hover:text-primary-300 font-bold transition-all duration-300 md:text-sm'>
+                    {user.name}
+                  </span>
+                  <span className='text-neutral-400 md:text-sm'>
+                    {user.username}
+                  </span>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };
