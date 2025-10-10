@@ -126,8 +126,11 @@ const Register = () => {
         {/* Data */}
         <div className='flex flex-col gap-4 md:gap-6'>
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Name</span>
+            <label htmlFor='name' className='font-bold md:text-sm'>
+              Name
+            </label>
             <Input
+              id='name'
               type='text'
               placeholder='Enter your name'
               value={name}
@@ -144,8 +147,11 @@ const Register = () => {
           </div>
 
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Username</span>
+            <label htmlFor='username' className='font-bold md:text-sm'>
+              Username
+            </label>
             <Input
+              id='username'
               type='text'
               placeholder='Enter your username'
               value={username}
@@ -164,8 +170,11 @@ const Register = () => {
           </div>
 
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Email</span>
+            <label htmlFor='email' className='font-bold md:text-sm'>
+              Email
+            </label>
             <Input
+              id='email'
               type='text'
               placeholder='Enter your email'
               value={email}
@@ -184,8 +193,11 @@ const Register = () => {
           </div>
 
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Phone Number</span>
+            <label htmlFor='phone' className='font-bold md:text-sm'>
+              Phone Number
+            </label>
             <Input
+              id='phone'
               type='tel'
               placeholder='Enter your phone number'
               value={phone}
@@ -204,8 +216,11 @@ const Register = () => {
           </div>
 
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Password</span>
+            <label htmlFor='password' className='font-bold md:text-sm'>
+              Password
+            </label>
             <Input
+              id='password'
               type='password'
               placeholder='Enter your password'
               value={password}
@@ -224,8 +239,11 @@ const Register = () => {
           </div>
 
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Confirm Password</span>
+            <label htmlFor='confirmPassword' className='font-bold md:text-sm'>
+              Confirm Password
+            </label>
             <Input
+              id='confirmPassword'
               type='password'
               placeholder='Enter your confirm password'
               value={newPassword}

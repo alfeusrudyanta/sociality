@@ -280,8 +280,11 @@ const EditProfile = () => {
             <div className='flex w-full max-w-[400px] flex-col items-center gap-4 md:max-w-none md:gap-6'>
               <div className='flex w-full flex-col gap-[2px]'>
                 {/* Name */}
-                <span className='font-bold md:text-sm'>Name</span>
+                <label htmlFor='name' className='font-bold md:text-sm'>
+                  Name
+                </label>
                 <Input
+                  id='name'
                   type='text'
                   placeholder='Enter your name'
                   value={name}
@@ -298,8 +301,11 @@ const EditProfile = () => {
 
               {/* Username */}
               <div className='flex w-full flex-col gap-[2px]'>
-                <span className='font-bold md:text-sm'>Username</span>
+                <label htmlFor='username' className='font-bold md:text-sm'>
+                  Username
+                </label>
                 <Input
+                  id='username'
                   type='text'
                   placeholder='Enter your username'
                   value={username}
@@ -316,8 +322,11 @@ const EditProfile = () => {
 
               {/* Email (readonly) */}
               <div className='flex w-full flex-col gap-[2px]'>
-                <span className='font-bold md:text-sm'>Email</span>
+                <label htmlFor='email' className='font-bold md:text-sm'>
+                  Email
+                </label>
                 <Input
+                  id='email'
                   type='email'
                   placeholder='Enter your email'
                   readOnly
@@ -329,8 +338,11 @@ const EditProfile = () => {
 
               {/* Phone Number */}
               <div className='flex w-full flex-col gap-[2px]'>
-                <span className='font-bold md:text-sm'>Phone Number</span>
+                <label htmlFor='phone' className='font-bold md:text-sm'>
+                  Phone Number
+                </label>
                 <Input
+                  id='phone'
                   type='tel'
                   placeholder='Enter your phone number'
                   value={phone}
@@ -347,8 +359,11 @@ const EditProfile = () => {
 
               {/* Bio */}
               <div className='flex w-full flex-col gap-[2px]'>
-                <span className='font-bold md:text-sm'>Bio</span>
+                <label htmlFor='bio' className='font-bold md:text-sm'>
+                  Bio
+                </label>
                 <Input
+                  id='bio'
                   type='text'
                   placeholder='Enter your bio'
                   value={bio}

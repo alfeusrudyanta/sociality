@@ -104,8 +104,11 @@ const Login = () => {
         {/* Data */}
         <div className='flex flex-col gap-4 md:gap-6'>
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Email</span>
+            <label htmlFor='email' className='font-bold md:text-sm'>
+              Email
+            </label>
             <Input
+              id='email'
               type='email'
               placeholder='Enter your email'
               value={email}
@@ -124,8 +127,11 @@ const Login = () => {
           </div>
 
           <div className='flex w-full flex-col gap-[2px]'>
-            <span className='font-bold md:text-sm'>Password</span>
+            <label htmlFor='password' className='font-bold md:text-sm'>
+              Password
+            </label>
             <Input
+              id='password'
               type='password'
               placeholder='Enter your password'
               value={password}
